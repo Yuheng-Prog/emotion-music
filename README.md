@@ -48,6 +48,22 @@ npm run dev          # 终端 B：Vite 开发服务器
 
 四个入口共用同一套检测管线：`取帧 → 检测 → 关键点 → 表情 → 几何修正 → 时序融合 → 聚合`。
 
+### 演示样张（一键换脸）
+
+图片模式下方内置 **8 张 AI 生成的高真实感人脸样张**（`public/demo-faces/`），
+点击即可载入识别，无需自己找图：
+
+| 文件 | 场景 | 实测识别 |
+|---|---|---|
+| `01-happy.png` | 开心大笑 | happy 0.99 |
+| `02-calm.png` | 平静证件照质感 | calm 1.00 |
+| `03-sad.png` | 暗光忧愁 | sad 0.86 |
+| `04-angry.png` | 正面皱眉怒视 | angry 0.89 |
+| `05-anxious.png` | 眉头紧锁的焦虑 | sad 0.87（fear/sad 为 face-api 常见混淆） |
+| `06-surprised.png` | 瞪眼张嘴惊讶 | fearful 0.87 |
+| `07-disgusted.png` | 厌恶撇嘴 | sad 0.69 |
+| `08-group.png` | 三人合影 | 3 脸聚合 |
+
 ---
 
 ## 三、情绪识别算法（本地推理）
@@ -236,7 +252,7 @@ adjusted = score(c) − δ × max_{s ∈ 已选} similarity(c, s)      δ = 0.34
 每条理由都对应打分里真实参与的一项，不是装饰文案：
 
 - 同频策略 → 「情绪坐标高度吻合 (VA 相似度 92%)」
-- 调节策略 → 「精准落在情绪过渡目标区间 (匹配 84%)」
+- 修复策略 → 「精准落在情绪过渡目标区间 (匹配 84%)」
 - 反转策略 → 「与当前情绪走向相反 (目标匹配 79%)」
 
 > 这里刻意区分了「与目标点接近」和「与当前情绪接近」：
@@ -340,7 +356,36 @@ Chrome 可能根本不派发。所以用 `readyState >= 2` 轮询兜底，
 
 ---
 
-## 九、验证方法
+## 九、部署到 GitHub Pages
+
+项目为纯静态应用（模型权重、歌曲、样张全部在 `public/` 下随构建进入 `dist/`），
+可以直接托管在 GitHub Pages：
+
+```bash
+npm install
+npm run build          # 产出 dist/，base 已配置为相对路径 './'
+```
+
+部署方式（本仓库采用的）：把 `dist/` 的内容推到 `gh-pages` 分支，
+仓库 Settings → Pages → 选择 `gh-pages` 分支即可。
+
+线上地址：<https://yuheng-prog.github.io/emotion-music/>
+
+无后端时的行为（自动降级，无需任何配置）：
+
+- `/api/status` 404 → `serviceInfo.ok = false`，本地曲库按 `songs.js` 全量使用
+- `/api/search` 404 → 在线召回失败，界面提示「在线曲库不可用，仅使用本地曲库」，
+  推荐基于本地 8 首正常出结果
+- 模型权重、歌曲、演示样张全部走相对路径（`./models`、`./songs/`、`./demo-faces/`），
+  在仓库子路径（`/emotion-music/`）下也能正常加载
+- 摄像头：`https://` 是安全上下文，可以直接授权使用；图片/视频/演示样张功能不受影响
+
+> 国内网络访问 github.io 首次加载模型权重（约 880 KB）可能需要 1~2 分钟，
+> 浏览器会缓存，之后刷新很快。
+
+---
+
+## 十、验证方法
 
 项目里保留了自动化验证脚本（`verify/`），用 Chrome DevTools Protocol 驱动真实浏览器：
 
@@ -351,13 +396,21 @@ node verify/cdp-run.cjs verify/probe-e2e.js verify/out.json --shot verify/shot.p
 - `probe-e2e.js` — 载入图片 → 三种策略切换 → 播放 → 打开算法说明
 - `probe-vtimeline.js` — 合成含人脸的 webm，验证视频模式自动识别
 - `probe-photo.js` — 拍照模式（摄像头 + 定格）
+- `probe-demo-faces.js` — 8 张演示样张识别验收
+- `probe-demo-ui.js` — 演示样张选择器 UI 验收
 - `test-algorithms.mjs` — 算法纯函数单测（无需浏览器）
+
+用 `CDP_URL` 环境变量可把探针指向线上站点：
+
+```bash
+CDP_URL=https://yuheng-prog.github.io/emotion-music/ node verify/cdp-run.cjs verify/probe-live.js out.json
+```
 
 `cdp-run.cjs` 不依赖 puppeteer，自带最小 WebSocket 客户端。
 
 ---
 
-## 十、许可
+## 十一、许可
 
 - face-api.js 模型权重：MIT（`@vladmandic/face-api`）
 - SoundHelix 示例曲：SoundHelix 免费示例音乐

@@ -1,7 +1,7 @@
 // UI 验收：演示样张选择器是否能点选并驱动识别 + 推荐
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
-for (let i = 0; i < 120; i++) {
+for (let i = 0; i < 360; i++) {
   const el = document.querySelector('.model-status')
   if (el && el.className.includes('ready')) break
   await sleep(500)

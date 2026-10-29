@@ -274,7 +274,7 @@ class MiniWS {
       mobile: false
     });
 
-    await send('Page.navigate', { url: 'http://127.0.0.1:8787/' });
+    await send('Page.navigate', { url: process.env.CDP_URL || 'http://127.0.0.1:8787/' });
     await sleep(2500);
 
     const src = fs.readFileSync(probeFile, 'utf8');
