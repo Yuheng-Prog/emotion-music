@@ -648,19 +648,51 @@ export class EmotionDetector {
     }
   }
 
-  /** 加载模型权重 (本地 public/models 目录) */
+  /**
+   * 加载模型权重。
+   *
+   * 双源回退：默认从本地 ./models 加载；若某个源超时/失败
+   * （典型场景：GitHub Pages 在国内网络下 github.io 吞吐只有 ~12KB/s，
+   * 880KB 的权重要等 1~2 分钟），自动切换到 jsDelivr CDN 镜像
+   * （它镜像了 gh-pages 分支，国内通常有就近节点）。
+   */
   async load(onProgress) {
     if (this.ready || this.loading) return this.ready
     this.loading = true
+    const mirrors = [this.modelPath, 'https://cdn.jsdelivr.net/gh/Yuheng-Prog/emotion-music@gh-pages/models']
     const steps = [
-      ['人脸检测模型 (TinyFaceDetector)', () => faceapi.nets.tinyFaceDetector.loadFromUri(this.modelPath)],
-      ['关键点模型 (68 landmarks)', () => faceapi.nets.faceLandmark68Net.loadFromUri(this.modelPath)],
-      ['表情分类模型 (Expression CNN)', () => faceapi.nets.faceExpressionNet.loadFromUri(this.modelPath)]
+      ['人脸检测模型 (TinyFaceDetector)', (uri) => faceapi.nets.tinyFaceDetector.loadFromUri(uri)],
+      ['关键点模型 (68 landmarks)', (uri) => faceapi.nets.faceLandmark68Net.loadFromUri(uri)],
+      ['表情分类模型 (Expression CNN)', (uri) => faceapi.nets.faceExpressionNet.loadFromUri(uri)]
     ]
+
+    // 单源超时：本地源正常应在数秒内完成（127.0.0.1 < 1s），
+    // 给 12s 兜底——超时就切换镜像，而不是在慢速源上干等
+    const withTimeout = (p, ms, tag) =>
+      Promise.race([
+        p,
+        new Promise((_, rej) => setTimeout(() => rej(new Error(tag + ' 超时 (' + ms + 'ms)')), ms))
+      ])
+
     for (let i = 0; i < steps.length; i++) {
       const [name, fn] = steps[i]
       onProgress?.({ index: i, total: steps.length, name, phase: 'loading' })
-      await fn()
+
+      let lastErr = null
+      for (const uri of mirrors) {
+        // 每轮都重新调用 fn(uri)：上一个源失败后需要发起全新的加载
+        try {
+          await withTimeout(fn(uri), uri === mirrors[0] ? 12000 : 45000, name)
+          lastErr = null
+          break
+        } catch (e) {
+          lastErr = e
+        }
+      }
+      if (lastErr) {
+        this.loading = false
+        throw lastErr
+      }
     }
     this.ready = true
     this.loading = false
