@@ -1,0 +1,140 @@
+/* ==========================================================================
+   全局样式变量 —— 浅色主题
+   ========================================================================== */
+
+:root {
+  --bg: #f6f7fb;
+  --bg-soft: #eef1f8;
+  --surface: #ffffff;
+  --surface-2: #f9fafc;
+  --border: #e3e7f0;
+  --border-strong: #d2d8e6;
+
+  --text: #1a1f2e;
+  --text-2: #5a6478;
+  --text-3: #8d97ac;
+
+  --brand: #5b5bd6;
+  --brand-soft: #ececff;
+  --brand-deep: #4343b8;
+
+  --happy: #f59e0b;
+  --calm: #10b981;
+  --sad: #3b82f6;
+  --angry: #ef4444;
+  --fearful: #8b5cf6;
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 20px;
+
+  --shadow-sm: 0 1px 2px rgba(23, 32, 60, 0.05);
+  --shadow: 0 2px 10px rgba(23, 32, 60, 0.06), 0 1px 3px rgba(23, 32, 60, 0.04);
+  --shadow-lg: 0 12px 32px rgba(23, 32, 60, 0.1);
+
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'SF Mono', 'Cascadia Code', Consolas, 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccd3e4;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b3bcd2;
+}
+
+/* ---------- 通用工具类 ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-12px);
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(12px);
+}
+.list-leave-active {
+  position: absolute;
+}

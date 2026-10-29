@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+server/node_modules/
+
+# 构建产物（gh-pages 分支单独承载 dist）
+dist/
+
+# 日志与临时产物
+*.log
+server.log
+verify/_*
+verify/demo-faces-result.json
+verify/_scale.json
+verify/_raw.json
+verify/_boxes.json
+verify/_bs.json
+verify/_cnt.json
+verify/_ui.json
+verify/_e2e.json
+verify/_ot.json
+verify/_sp.json
+verify/_fr.json
+verify/_tl.json
+
+# 工作区配置
+.workbuddy/
+.DS_Store
+Thumbs.db

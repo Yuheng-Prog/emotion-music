@@ -1,0 +1,16 @@
+console=0 errors=0 failed=0
+01-happy.png       expect=happy   luma=136  faces=1  happy   conf=null  det=0  px=480  3907ms
+   moods: {"happy":1,"calm":0,"sad":0,"angry":0,"fearful":0}
+02-calm.png        expect=calm    luma=132  faces=1  calm    conf=null  det=0  px=405  57ms
+   moods: {"happy":0,"calm":0.99,"sad":0,"angry":0,"fearful":0.01}
+03-sad.png         expect=sad     luma=56   faces=1  sad     conf=null  det=0  px=311  47ms
+   moods: {"happy":0,"calm":0.13,"sad":0.87,"angry":0,"fearful":0}
+04-angry.png       expect=angry   luma=53   faces=1  angry   conf=null  det=0  px=839  54ms
+   moods: {"happy":0,"calm":0.07,"sad":0.39,"angry":0.53,"fearful":0}
+05-anxious.png     expect=fearful luma=45   faces=0  -       conf=-  det=-  px=-  33ms
+06-surprised.png   expect=fearful luma=117  faces=0  -       conf=-  det=-  px=-  34ms
+07-disgusted.png   expect=sad     luma=120  faces=1  sad     conf=null  det=0  px=547  55ms
+   moods: {"happy":0,"calm":0,"sad":0.54,"angry":0.46,"fearful":0}
+08-group.png       expect=-       luma=115  faces=3  calm    conf=null  det=0  px=449  77ms
+   moods: {"happy":0.19,"calm":0.81,"sad":0,"angry":0,"fearful":0}
+   全部: calm:null, happy:null, happy:null
