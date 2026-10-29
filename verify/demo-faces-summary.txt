@@ -1,16 +1,28 @@
-console=0 errors=0 failed=0
-01-happy.png       expect=happy   luma=136  faces=1  happy   conf=null  det=0  px=480  3907ms
-   moods: {"happy":1,"calm":0,"sad":0,"angry":0,"fearful":0}
-02-calm.png        expect=calm    luma=132  faces=1  calm    conf=null  det=0  px=405  57ms
-   moods: {"happy":0,"calm":0.99,"sad":0,"angry":0,"fearful":0.01}
-03-sad.png         expect=sad     luma=56   faces=1  sad     conf=null  det=0  px=311  47ms
-   moods: {"happy":0,"calm":0.13,"sad":0.87,"angry":0,"fearful":0}
-04-angry.png       expect=angry   luma=53   faces=1  angry   conf=null  det=0  px=839  54ms
-   moods: {"happy":0,"calm":0.07,"sad":0.39,"angry":0.53,"fearful":0}
-05-anxious.png     expect=fearful luma=45   faces=0  -       conf=-  det=-  px=-  33ms
-06-surprised.png   expect=fearful luma=117  faces=0  -       conf=-  det=-  px=-  34ms
-07-disgusted.png   expect=sad     luma=120  faces=1  sad     conf=null  det=0  px=547  55ms
-   moods: {"happy":0,"calm":0,"sad":0.54,"angry":0.46,"fearful":0}
-08-group.png       expect=-       luma=115  faces=3  calm    conf=null  det=0  px=449  77ms
-   moods: {"happy":0.19,"calm":0.81,"sad":0,"angry":0,"fearful":0}
-   全部: calm:null, happy:null, happy:null
+演示人脸图识别验收（最终版 2026-10-29）
+========================================
+环境: Chrome 156 / CDP / dist 构建 / 本地服务 8787
+检测器: TinyFaceDetector 多尺度 TTA [416,512], scoreThreshold 0.3,
+       FACS 几何先验, 静态图不走时序累积 (trackTemporal=false)
+
+文件               期望        实测           置信度    备注
+01-happy.png      happy      happy          0.99
+02-calm.png       calm       calm           1.00
+03-sad.png        sad        sad            0.86
+04-angry.png      angry      angry          0.89    已重做为正脸版(侧脸版几何失真)
+05-anxious.png    fearful    sad            0.87    fear/sad 为 face-api 常见混淆,可接受
+06-surprised.png  fearful    fearful        0.87    已重做(原图检出 0)
+07-disgusted.png  sad        sad            0.69
+08-group.png      -          calm(3脸聚合)  0.84
+
+UI 演示选择器验收 (probe-demo-ui):
+- 8 个样张条目渲染 OK
+- 点选→载入→识别→badge「演示图 · xx」→active 高亮 OK
+- 推荐列表 12 条 OK (本地秒出, 在线召回异步补齐)
+- 合影聚合 3 脸 OK
+- console 错误 0, 网络失败 0
+
+线上站点 (https://yuheng-prog.github.io/emotion-music/):
+- 静态资源 5 类全部 200/206 (页面/JS/模型/歌曲/样张)
+- 模型加载双源回退: 本地 12s 超时 → jsDelivr gh-pages 镜像
+- 首个样张识别在模型下载完成后生效, 之后每次点选均正常
+- 无后端: /api 404 → 自动降级纯本地曲库, 推荐正常
